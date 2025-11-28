@@ -5,27 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Water Tank Monitor - IoT Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1> Smart Water Tank Monitor</h1>
+            <h1>💧 Smart Water Tank Monitor</h1>
             <p class="subtitle">Real-time IoT Monitoring System</p>
         </header>
 
         <div class="dashboard">
-            <!-- Status Card -->
-            <div class="card status-card">
-                <h2>Tank Status</h2>
-                <div class="status-indicator" id="statusIndicator">
-                    <span class="status-icon" id="statusIcon">⏳</span>
-                    <span class="status-text" id="statusText">Loading...</span>
-                </div>
+            <!-- Graph Card (replaces Tank Status) -->
+            <div class="card graph-card">
+                <h2>Water Level History</h2>
+                <canvas id="waterLevelChart"></canvas>
             </div>
 
             <!-- Tank Visualization -->
             <div class="card tank-card">
-                <h2>Water Level</h2>
+                <h2>Current Water Level</h2>
                 <div class="tank-container">
                     <div class="tank">
                         <div class="water" id="waterLevel">
@@ -34,6 +32,9 @@
                         <div class="tank-outline"></div>
                     </div>
                     <div class="percentage" id="percentage">0%</div>
+                    <div class="status-mini">
+                        <span id="statusTextMini">Unknown</span>
+                    </div>
                 </div>
             </div>
 
@@ -57,7 +58,7 @@
                         <span class="data-label">Connection:</span>
                         <span class="data-value" id="connection">
                             <span class="dot" id="connectionDot"></span>
-                            <span id="connectionStatus">Connecting...</span>
+                            <span id="connectionStatus">Ready</span>
                         </span>
                     </div>
                 </div>
@@ -67,9 +68,9 @@
         <!-- Refresh Button -->
         <div class="controls">
             <button class="refresh-btn" id="refreshBtn" onclick="fetchTankData()">
-                <span class="refresh-icon">🔄=</span> Refresh Now
+                <span class="refresh-icon">🔄</span> Refresh Data
             </button>
-            <p class="auto-refresh-text">Auto-refresh every 30 seconds</p>
+            <p class="auto-refresh-text">Click refresh to update data from AWS</p>
         </div>
 
         <footer>
