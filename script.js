@@ -1,9 +1,13 @@
+// ⚠️ IMPORTANT: Replace this URL with your actual API Gateway endpoint
 const API_URL = 'https://3haka9uhp9.execute-api.us-east-1.amazonaws.com/prod/status';
 
-// Simple front-end login (demo only, not secure for real apps)
+// Login credentials (demo only - not secure for production)
 const VALID_USERNAME = 'host';
 const VALID_PASSWORD = 'login123';
 
+let waterLevelChart = null;
+
+// Setup login functionality
 function setupLogin() {
     const loginSection = document.getElementById('loginSection');
     const appSection = document.getElementById('appSection');
@@ -12,7 +16,7 @@ function setupLogin() {
     const userInput = document.getElementById('username');
     const passInput = document.getElementById('password');
 
-    // If you want to remember login in this browser, you can use localStorage
+    // Check if already logged in this session
     const alreadyLoggedIn = sessionStorage.getItem('tankDashboardLoggedIn') === 'true';
     if (alreadyLoggedIn) {
         loginSection.classList.add('hidden');
@@ -21,31 +25,40 @@ function setupLogin() {
         return;
     }
 
+    // Login button click handler
     loginBtn.addEventListener('click', () => {
         const u = userInput.value.trim();
         const p = passInput.value;
 
         if (u === VALID_USERNAME && p === VALID_PASSWORD) {
-            // Hide login, show app
+            // Successful login
             loginSection.classList.add('hidden');
             appSection.classList.remove('hidden');
             errorLabel.textContent = '';
             sessionStorage.setItem('tankDashboardLoggedIn', 'true');
+            console.log('Login successful');
             fetchTankData();
         } else {
+            // Failed login
             errorLabel.textContent = 'Invalid username or password.';
+            passInput.value = '';
+            console.log('Login failed');
         }
     });
 
-    // Allow Enter key in password field
+    // Allow Enter key to login
+    userInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            loginBtn.click();
+        }
+    });
+
     passInput.addEventListener('keyup', (e) => {
         if (e.key === 'Enter') {
             loginBtn.click();
         }
     });
 }
-
-let waterLevelChart = null;
 
 // Fetch tank data from AWS API Gateway
 async function fetchTankData() {
@@ -271,9 +284,9 @@ function updateChart(history) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('═══════════════════════════════════════');
     console.log('Water Tank Dashboard Initialized');
-    console.log('API_URL:', API_URL);
+    console.log('Login protected with username/password');
     console.log('═══════════════════════════════════════');
     
-    // Fetch data on page load
-    fetchTankData();
+    // Setup login - will auto-fetch after successful login
+    setupLogin();
 });
