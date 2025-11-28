@@ -36,7 +36,7 @@ header h1 {
 
 .dashboard {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 25px;
     margin-bottom: 30px;
 }
@@ -57,43 +57,44 @@ header h1 {
     padding-bottom: 10px;
 }
 
-/* Status Card */
-.status-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+/* Graph Card - Large and prominent */
+.graph-card {
+    grid-column: 1 / -1;
+    min-height: 400px;
     padding: 30px;
 }
 
-.status-icon {
-    font-size: 4em;
+.graph-card h2 {
+    font-size: 1.8em;
+    margin-bottom: 25px;
+}
+
+.graph-card canvas {
+    max-height: 350px !important;
+    min-height: 300px;
+}
+
+/* Tank Card - Smaller */
+.tank-card {
+    padding: 20px;
+}
+
+.tank-card h2 {
+    font-size: 1.3em;
     margin-bottom: 15px;
 }
 
-.status-text {
-    font-size: 1.8em;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.status-full { color: #22c55e; }
-.status-medium { color: #f59e0b; }
-.status-low { color: #ef4444; }
-.status-empty { color: #dc2626; }
-
-/* Tank Visualization */
 .tank-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 15px;
 }
 
 .tank {
     position: relative;
-    width: 200px;
-    height: 300px;
+    width: 160px;
+    height: 240px;
     border: 4px solid #333;
     border-radius: 10px;
     overflow: hidden;
@@ -129,26 +130,49 @@ header h1 {
 }
 
 .percentage {
-    margin-top: 20px;
-    font-size: 3em;
+    margin-top: 15px;
+    font-size: 2.5em;
     font-weight: bold;
     color: #667eea;
 }
 
-/* Data Card */
+/* Status Mini */
+.status-mini {
+    margin-top: 10px;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.status-mini .status-full { color: #22c55e; }
+.status-mini .status-medium { color: #f59e0b; }
+.status-mini .status-low { color: #ef4444; }
+.status-mini .status-empty { color: #dc2626; }
+
+/* Data Card - Smaller */
+.data-card {
+    padding: 20px;
+}
+
+.data-card h2 {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+}
+
 .data-grid {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
 .data-item {
     display: flex;
     justify-content: space-between;
-    padding: 15px;
+    padding: 12px;
     background: #f8f9fa;
     border-radius: 8px;
     border-left: 4px solid #667eea;
+    font-size: 0.95em;
 }
 
 .data-label {
@@ -213,6 +237,11 @@ header h1 {
     transform: translateY(0);
 }
 
+.refresh-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .refresh-icon {
     font-size: 1.2em;
     display: inline-block;
@@ -270,40 +299,21 @@ footer {
         grid-template-columns: 1fr;
     }
     
-    .tank {
-        width: 150px;
-        height: 250px;
+    .graph-card {
+        min-height: 300px;
     }
-    /* Graph Card */
-.graph-card {
-    grid-column: 1 / -1; /* Span full width */
-    min-height: 300px;
-}
-
-.graph-card canvas {
-    max-height: 250px;
-}
-
-/* Status Mini for Tank Card */
-.status-mini {
-    margin-top: 10px;
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
-.status-mini .status-full { color: #22c55e; }
-.status-mini .status-medium { color: #f59e0b; }
-.status-mini .status-low { color: #ef4444; }
-.status-mini .status-empty { color: #dc2626; }
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
+    
     .graph-card canvas {
-        max-height: 200px;
+        max-height: 250px !important;
+        min-height: 200px;
     }
-}
-
+    
+    .tank {
+        width: 140px;
+        height: 220px;
+    }
+    
     .percentage {
-        font-size: 2.5em;
+        font-size: 2em;
     }
 }
