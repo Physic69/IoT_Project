@@ -9,71 +9,96 @@
 </head>
 <body>
     <div class="container">
-        <header>
+
+        <!-- Login Screen -->
+        <div id="loginSection" class="login-section">
             <h1>💧 Smart Water Tank Monitor</h1>
-            <p class="subtitle">Real-time IoT Monitoring System</p>
-        </header>
+            <p class="subtitle">Login to view tank data</p>
 
-        <div class="dashboard">
-            <!-- Graph Card (replaces Tank Status) -->
-            <div class="card graph-card">
-                <h2>Water Level History</h2>
-                <canvas id="waterLevelChart"></canvas>
+            <div class="login-card">
+                <div class="login-row">
+                    <label for="username">Username</label>
+                    <input id="username" type="text" placeholder="Enter username">
+                </div>
+                <div class="login-row">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" placeholder="Enter password">
+                </div>
+                <button id="loginBtn" class="login-btn">Login</button>
+                <p id="loginError" class="login-error"></p>
             </div>
+        </div>
 
-            <!-- Tank Visualization -->
-            <div class="card tank-card">
-                <h2>Current Water Level</h2>
-                <div class="tank-container">
-                    <div class="tank">
-                        <div class="water" id="waterLevel">
-                            <div class="wave"></div>
+        <!-- Main Dashboard (hidden until login) -->
+        <div id="appSection" class="app-section hidden">
+            <header>
+                <h1>💧 Smart Water Tank Monitor</h1>
+                <p class="subtitle">Real-time IoT Monitoring System</p>
+            </header>
+
+            <div class="dashboard">
+                <!-- Graph Card -->
+                <div class="card graph-card">
+                    <h2>Water Level History</h2>
+                    <canvas id="waterLevelChart"></canvas>
+                </div>
+
+                <!-- Tank Visualization -->
+                <div class="card tank-card">
+                    <h2>Current Water Level</h2>
+                    <div class="tank-container">
+                        <div class="tank">
+                            <div class="water" id="waterLevel">
+                                <div class="wave"></div>
+                            </div>
+                            <div class="tank-outline"></div>
                         </div>
-                        <div class="tank-outline"></div>
+                        <div class="percentage" id="percentage">0%</div>
+                        <div class="status-mini">
+                            <span id="statusTextMini">Unknown</span>
+                        </div>
                     </div>
-                    <div class="percentage" id="percentage">0%</div>
-                    <div class="status-mini">
-                        <span id="statusTextMini">Unknown</span>
+                </div>
+
+                <!-- Data Card -->
+                <div class="card data-card">
+                    <h2>Sensor Data</h2>
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span class="data-label">Distance:</span>
+                            <span class="data-value" id="distance">-- cm</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Device:</span>
+                            <span class="data-value" id="device">--</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Last Update:</span>
+                            <span class="data-value" id="timestamp">--</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Connection:</span>
+                            <span class="data-value" id="connection">
+                                <span class="dot" id="connectionDot"></span>
+                                <span id="connectionStatus">Ready</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Data Card -->
-            <div class="card data-card">
-                <h2>Sensor Data</h2>
-                <div class="data-grid">
-                    <div class="data-item">
-                        <span class="data-label">Distance:</span>
-                        <span class="data-value" id="distance">-- cm</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="data-label">Device:</span>
-                        <span class="data-value" id="device">--</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="data-label">Last Update:</span>
-                        <span class="data-value" id="timestamp">--</span>
-                    </div>
-                    <div class="data-item">
-                        <span class="data-label">Connection:</span>
-                        <span class="data-value" id="connection">
-                            <span class="dot" id="connectionDot"></span>
-                            <span id="connectionStatus">Ready</span>
-                        </span>
-                    </div>
-                </div>
+            <!-- Refresh Button -->
+            <div class="controls">
+                <button class="refresh-btn" id="refreshBtn" onclick="fetchTankData()">
+                    <span class="refresh-icon">🔄</span> Refresh Data
+                </button>
+                <p class="auto-refresh-text">Click refresh to update data from AWS</p>
             </div>
-        </div>
-        <div class="controls">
-            <button class="refresh-btn" id="refreshBtn" onclick="fetchTankData()">
-                <span class="refresh-icon">🔄</span> Refresh Data
-            </button>
-            <p class="auto-refresh-text">Click refresh to update data from AWS</p>
-        </div>
 
-        <footer>
-            <p>ESP32 Water Tank Monitoring System | IoT Course Project</p>
-        </footer>
+            <footer>
+                <p>ESP32 Water Tank Monitoring System | IoT Course Project</p>
+            </footer>
+        </div>
     </div>
 
     <script src="script.js"></script>
