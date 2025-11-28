@@ -1,6 +1,5 @@
 // ⚠️ IMPORTANT: Replace this URL with your actual API Gateway endpoint
 const API_URL = 'https://3haka9uhp9.execute-api.us-east-1.amazonaws.com/prod/status';
-
 // Auto-refresh interval (30 seconds)
 const REFRESH_INTERVAL = 30000;
 
@@ -10,20 +9,39 @@ async function fetchTankData() {
     const connectionDot = document.getElementById('connectionDot');
     const connectionStatus = document.getElementById('connectionStatus');
     
+    // 🔍 DEBUG: Log the URL being called
+    console.log('=== FETCH STARTED ===');
+    console.log('API URL:', API_URL);
+    console.log('Time:', new Date().toLocaleTimeString());
+    
     try {
         // Show loading state
         refreshBtn.disabled = true;
         connectionStatus.textContent = 'Fetching...';
         connectionDot.className = 'dot';
         
+        // 🔍 DEBUG: Log before fetch
+        console.log('Making fetch request...');
+        
         // Fetch data from API
         const response = await fetch(API_URL);
+        
+        // 🔍 DEBUG: Log response details
+        console.log('Response received!');
+        console.log('Status:', response.status);
+        console.log('Status Text:', response.statusText);
+        console.log('Headers:', response.headers);
+        console.log('OK?', response.ok);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
+        
+        // 🔍 DEBUG: Log the data received
+        console.log('Data received:', data);
+        console.log('=== FETCH SUCCESS ===\n');
         
         // Update UI with fetched data
         updateDashboard(data);
@@ -33,7 +51,13 @@ async function fetchTankData() {
         connectionStatus.textContent = 'Connected';
         
     } catch (error) {
-        console.error('Error fetching tank data:', error);
+        // 🔍 DEBUG: Log detailed error information
+        console.error('=== FETCH FAILED ===');
+        console.error('Error Type:', error.name);
+        console.error('Error Message:', error.message);
+        console.error('Full Error:', error);
+        console.error('Stack:', error.stack);
+        console.error('===================\n');
         
         // Show error state
         connectionDot.className = 'dot offline';
@@ -43,11 +67,17 @@ async function fetchTankData() {
         document.getElementById('statusText').textContent = 'Error';
         document.getElementById('statusIcon').textContent = '❌';
         
-        alert('Failed to fetch data from AWS IoT. Please check:\n' +
-              '1. Your API Gateway URL is correct\n' +
-              '2. CORS is enabled on API Gateway\n' +
-              '3. ESP32 is sending data\n\n' +
-              'Error: ' + error.message);
+        // Show detailed error in alert
+        let errorDetails = `Error: ${error.message}\n\n`;
+        errorDetails += `API URL: ${API_URL}\n\n`;
+        errorDetails += `Check Console (F12) for more details.\n\n`;
+        errorDetails += `Common issues:\n`;
+        errorDetails += `1. Wrong API URL in script.js\n`;
+        errorDetails += `2. CORS not enabled in API Gateway\n`;
+        errorDetails += `3. API not deployed\n`;
+        errorDetails += `4. No data in DynamoDB`;
+        
+        alert(errorDetails);
     } finally {
         refreshBtn.disabled = false;
     }
@@ -55,12 +85,16 @@ async function fetchTankData() {
 
 // Update dashboard with new data
 function updateDashboard(data) {
+    console.log('Updating dashboard with data:', data);
+    
     // Extract values
     const level = data.level || 0;
     const status = data.status || 'Unknown';
     const distance = data.distance || 0;
     const device = data.device || 'ESP32_Tank';
     const timestamp = data.timestamp || Date.now();
+    
+    console.log('Parsed values:', { level, status, distance, device, timestamp });
     
     // Update water level visual
     const waterLevel = document.getElementById('waterLevel');
@@ -72,7 +106,6 @@ function updateDashboard(data) {
     // Update status with icon and color
     const statusIcon = document.getElementById('statusIcon');
     const statusText = document.getElementById('statusText');
-    const statusIndicator = document.getElementById('statusIndicator');
     
     // Remove previous status classes
     statusText.className = 'status-text';
@@ -120,17 +153,21 @@ function updateDashboard(data) {
         hour12: true
     });
     document.getElementById('timestamp').textContent = timeString;
+    
+    console.log('Dashboard updated successfully!');
 }
 
 // Initialize dashboard on page load
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Water Tank Dashboard Initialized');
+    console.log('╔════════════════════════════════════════╗');
+    console.log('║  Water Tank Dashboard Initialized     ║');
+    console.log('╚════════════════════════════════════════╝');
+    console.log('API URL:', API_URL);
+    console.log('Refresh interval:', REFRESH_INTERVAL/1000, 'seconds\n');
     
     // Fetch data immediately
     fetchTankData();
     
     // Set up auto-refresh
     setInterval(fetchTankData, REFRESH_INTERVAL);
-    
-    console.log(`Auto-refresh enabled: every ${REFRESH_INTERVAL/1000} seconds`);
 });
