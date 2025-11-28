@@ -1,5 +1,5 @@
 // ⚠️ IMPORTANT: Replace this URL with your actual API Gateway endpoint
-const API_URL = 'https://3haka9uhp9.execute-api.us-east-1.amazonaws.com/prod';
+const API_URL = 'https://3haka9uhp9.execute-api.us-east-1.amazonaws.com/prod/status';
 
 // Auto-refresh interval (30 seconds)
 const REFRESH_INTERVAL = 30000;
