@@ -1,4 +1,3 @@
-// ⚠️ IMPORTANT: Replace this URL with your actual API Gateway endpoint
 const API_URL = 'https://3haka9uhp9.execute-api.us-east-1.amazonaws.com/prod/status';
 
 // Login credentials (demo only - not secure for production)
@@ -9,6 +8,8 @@ let waterLevelChart = null;
 
 // Setup login functionality
 function setupLogin() {
+    console.log('Setting up login...');
+    
     const loginSection = document.getElementById('loginSection');
     const appSection = document.getElementById('appSection');
     const loginBtn = document.getElementById('loginBtn');
@@ -16,8 +17,24 @@ function setupLogin() {
     const userInput = document.getElementById('username');
     const passInput = document.getElementById('password');
 
+    // Debug: Check if all elements exist
+    console.log('loginSection:', loginSection);
+    console.log('appSection:', appSection);
+    console.log('loginBtn:', loginBtn);
+    console.log('errorLabel:', errorLabel);
+    console.log('userInput:', userInput);
+    console.log('passInput:', passInput);
+
+    if (!loginBtn || !userInput || !passInput) {
+        console.error('ERROR: Login elements not found!');
+        alert('Login page error - check console');
+        return;
+    }
+
     // Check if already logged in this session
     const alreadyLoggedIn = sessionStorage.getItem('tankDashboardLoggedIn') === 'true';
+    console.log('Already logged in?', alreadyLoggedIn);
+    
     if (alreadyLoggedIn) {
         loginSection.classList.add('hidden');
         appSection.classList.remove('hidden');
@@ -26,38 +43,51 @@ function setupLogin() {
     }
 
     // Login button click handler
-    loginBtn.addEventListener('click', () => {
+    loginBtn.onclick = function() {
+        console.log('Login button clicked!');
+        
         const u = userInput.value.trim();
         const p = passInput.value;
+        
+        console.log('Username entered:', u);
+        console.log('Password entered:', p);
+        console.log('Expected username:', VALID_USERNAME);
+        console.log('Expected password:', VALID_PASSWORD);
+        console.log('Username match:', u === VALID_USERNAME);
+        console.log('Password match:', p === VALID_PASSWORD);
 
         if (u === VALID_USERNAME && p === VALID_PASSWORD) {
+            console.log('✅ Login successful!');
             // Successful login
             loginSection.classList.add('hidden');
             appSection.classList.remove('hidden');
             errorLabel.textContent = '';
             sessionStorage.setItem('tankDashboardLoggedIn', 'true');
-            console.log('Login successful');
             fetchTankData();
         } else {
+            console.log('❌ Login failed!');
             // Failed login
-            errorLabel.textContent = 'Invalid username or password.';
+            errorLabel.textContent = '❌ Invalid username or password.';
             passInput.value = '';
-            console.log('Login failed');
         }
-    });
+    };
 
     // Allow Enter key to login
-    userInput.addEventListener('keyup', (e) => {
+    userInput.onkeyup = function(e) {
         if (e.key === 'Enter') {
+            console.log('Enter pressed in username field');
             loginBtn.click();
         }
-    });
+    };
 
-    passInput.addEventListener('keyup', (e) => {
+    passInput.onkeyup = function(e) {
         if (e.key === 'Enter') {
+            console.log('Enter pressed in password field');
             loginBtn.click();
         }
-    });
+    };
+    
+    console.log('Login setup complete!');
 }
 
 // Fetch tank data from AWS API Gateway
@@ -72,17 +102,21 @@ async function fetchTankData() {
     // Check if API_URL is still placeholder
     if (API_URL.includes('YOUR') || API_URL.includes('PASTE')) {
         alert('ERROR: You need to update the API_URL in script.js!\n\nReplace line 2 with your actual API Gateway URL.');
-        connectionStatus.textContent = 'Config Error';
-        connectionDot.className = 'dot offline';
+        if (connectionStatus && connectionDot) {
+            connectionStatus.textContent = 'Config Error';
+            connectionDot.className = 'dot offline';
+        }
         return;
     }
     
     try {
         // Show loading state
-        refreshBtn.disabled = true;
-        refreshBtn.innerHTML = '<span class="refresh-icon">⏳</span> Loading...';
-        connectionStatus.textContent = 'Fetching...';
-        connectionDot.className = 'dot';
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '<span class="refresh-icon">⏳</span> Loading...';
+        }
+        if (connectionStatus) connectionStatus.textContent = 'Fetching...';
+        if (connectionDot) connectionDot.className = 'dot';
         
         console.log('Making fetch request...');
         
@@ -110,21 +144,23 @@ async function fetchTankData() {
         }
         
         // Update connection status
-        connectionDot.className = 'dot online';
-        connectionStatus.textContent = 'Connected';
+        if (connectionDot) connectionDot.className = 'dot online';
+        if (connectionStatus) connectionStatus.textContent = 'Connected';
         console.log('Update complete!');
         
     } catch (error) {
         console.error('Error details:', error);
         
         // Show error state
-        connectionDot.className = 'dot offline';
-        connectionStatus.textContent = 'Error';
+        if (connectionDot) connectionDot.className = 'dot offline';
+        if (connectionStatus) connectionStatus.textContent = 'Error';
         
         alert('Failed to fetch data.\n\nError: ' + error.message + '\n\nCheck:\n1. API_URL is correct in script.js\n2. CORS is enabled\n3. Lambda is deployed\n4. Check Console (F12) for details');
     } finally {
-        refreshBtn.disabled = false;
-        refreshBtn.innerHTML = '<span class="refresh-icon">🔄</span> Refresh Data';
+        if (refreshBtn) {
+            refreshBtn.disabled = false;
+            refreshBtn.innerHTML = '<span class="refresh-icon">🔄</span> Refresh Data';
+        }
     }
 }
 
@@ -143,35 +179,41 @@ function updateDashboard(data) {
     
     // Update water level visual
     const waterLevel = document.getElementById('waterLevel');
-    waterLevel.style.height = level + '%';
+    if (waterLevel) waterLevel.style.height = level + '%';
     
     // Update percentage display
-    document.getElementById('percentage').textContent = level + '%';
+    const percentageEl = document.getElementById('percentage');
+    if (percentageEl) percentageEl.textContent = level + '%';
     
     // Update status mini
     const statusTextMini = document.getElementById('statusTextMini');
-    statusTextMini.textContent = status;
-    statusTextMini.className = '';
-    
-    // Set status color
-    switch(status.toLowerCase()) {
-        case 'full':
-            statusTextMini.classList.add('status-full');
-            break;
-        case 'medium':
-            statusTextMini.classList.add('status-medium');
-            break;
-        case 'low':
-            statusTextMini.classList.add('status-low');
-            break;
-        case 'empty':
-            statusTextMini.classList.add('status-empty');
-            break;
+    if (statusTextMini) {
+        statusTextMini.textContent = status;
+        statusTextMini.className = '';
+        
+        // Set status color
+        switch(status.toLowerCase()) {
+            case 'full':
+                statusTextMini.classList.add('status-full');
+                break;
+            case 'medium':
+                statusTextMini.classList.add('status-medium');
+                break;
+            case 'low':
+                statusTextMini.classList.add('status-low');
+                break;
+            case 'empty':
+                statusTextMini.classList.add('status-empty');
+                break;
+        }
     }
     
     // Update sensor data
-    document.getElementById('distance').textContent = distance + ' cm';
-    document.getElementById('device').textContent = device;
+    const distanceEl = document.getElementById('distance');
+    if (distanceEl) distanceEl.textContent = distance + ' cm';
+    
+    const deviceEl = document.getElementById('device');
+    if (deviceEl) deviceEl.textContent = device;
     
     // Format timestamp
     const date = new Date(timestamp);
@@ -184,7 +226,8 @@ function updateDashboard(data) {
         second: '2-digit',
         hour12: true
     });
-    document.getElementById('timestamp').textContent = timeString;
+    const timestampEl = document.getElementById('timestamp');
+    if (timestampEl) timestampEl.textContent = timeString;
     
     console.log('Dashboard updated!');
 }
@@ -193,7 +236,13 @@ function updateDashboard(data) {
 function updateChart(history) {
     console.log('Creating chart with', history.length, 'data points');
     
-    const ctx = document.getElementById('waterLevelChart').getContext('2d');
+    const ctx = document.getElementById('waterLevelChart');
+    if (!ctx) {
+        console.error('Chart canvas not found!');
+        return;
+    }
+    
+    const context = ctx.getContext('2d');
     
     // Reverse to show oldest to newest
     const sortedHistory = [...history].reverse();
@@ -220,7 +269,7 @@ function updateChart(history) {
     }
     
     // Create new chart
-    waterLevelChart = new Chart(ctx, {
+    waterLevelChart = new Chart(context, {
         type: 'line',
         data: {
             labels: labels,
