@@ -1,5 +1,49 @@
 const API_URL = 'https://3haka9uhp9.execute-api.us-east-1.amazonaws.com/prod/status';
 
+// Simple front-end login (demo only, not secure for real apps)
+const VALID_USERNAME = 'host';
+const VALID_PASSWORD = 'login123';
+
+function setupLogin() {
+    const loginSection = document.getElementById('loginSection');
+    const appSection = document.getElementById('appSection');
+    const loginBtn = document.getElementById('loginBtn');
+    const errorLabel = document.getElementById('loginError');
+    const userInput = document.getElementById('username');
+    const passInput = document.getElementById('password');
+
+    // If you want to remember login in this browser, you can use localStorage
+    const alreadyLoggedIn = sessionStorage.getItem('tankDashboardLoggedIn') === 'true';
+    if (alreadyLoggedIn) {
+        loginSection.classList.add('hidden');
+        appSection.classList.remove('hidden');
+        fetchTankData();
+        return;
+    }
+
+    loginBtn.addEventListener('click', () => {
+        const u = userInput.value.trim();
+        const p = passInput.value;
+
+        if (u === VALID_USERNAME && p === VALID_PASSWORD) {
+            // Hide login, show app
+            loginSection.classList.add('hidden');
+            appSection.classList.remove('hidden');
+            errorLabel.textContent = '';
+            sessionStorage.setItem('tankDashboardLoggedIn', 'true');
+            fetchTankData();
+        } else {
+            errorLabel.textContent = 'Invalid username or password.';
+        }
+    });
+
+    // Allow Enter key in password field
+    passInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') {
+            loginBtn.click();
+        }
+    });
+}
 
 let waterLevelChart = null;
 
