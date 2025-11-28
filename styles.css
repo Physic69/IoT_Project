@@ -274,7 +274,35 @@ footer {
         width: 150px;
         height: 250px;
     }
-    
+    /* Graph Card */
+.graph-card {
+    grid-column: 1 / -1; /* Span full width */
+    min-height: 300px;
+}
+
+.graph-card canvas {
+    max-height: 250px;
+}
+
+/* Status Mini for Tank Card */
+.status-mini {
+    margin-top: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.status-mini .status-full { color: #22c55e; }
+.status-mini .status-medium { color: #f59e0b; }
+.status-mini .status-low { color: #ef4444; }
+.status-mini .status-empty { color: #dc2626; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .graph-card canvas {
+        max-height: 200px;
+    }
+}
+
     .percentage {
         font-size: 2.5em;
     }
