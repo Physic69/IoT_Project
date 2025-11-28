@@ -1,5 +1,6 @@
-// ⚠️ IMPORTANT: Replace this URL with your actual API Gateway endpoint
 const API_URL = 'https://3haka9uhp9.execute-api.us-east-1.amazonaws.com/prod/status';
+
+
 let waterLevelChart = null;
 
 // Fetch tank data from AWS API Gateway
@@ -8,6 +9,17 @@ async function fetchTankData() {
     const connectionDot = document.getElementById('connectionDot');
     const connectionStatus = document.getElementById('connectionStatus');
     
+    console.log('Starting fetch...');
+    console.log('API_URL:', API_URL);
+    
+    // Check if API_URL is still placeholder
+    if (API_URL.includes('YOUR') || API_URL.includes('PASTE')) {
+        alert('ERROR: You need to update the API_URL in script.js!\n\nReplace line 2 with your actual API Gateway URL.');
+        connectionStatus.textContent = 'Config Error';
+        connectionDot.className = 'dot offline';
+        return;
+    }
+    
     try {
         // Show loading state
         refreshBtn.disabled = true;
@@ -15,31 +27,44 @@ async function fetchTankData() {
         connectionStatus.textContent = 'Fetching...';
         connectionDot.className = 'dot';
         
+        console.log('Making fetch request...');
+        
         // Fetch data from API
         const response = await fetch(API_URL);
+        
+        console.log('Response:', response.status, response.statusText);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
+        console.log('Data received:', data);
         
         // Update UI with fetched data
         updateDashboard(data);
-        updateChart(data.history || []);
+        
+        // Update chart if history exists
+        if (data.history && data.history.length > 0) {
+            console.log('Updating chart with', data.history.length, 'entries');
+            updateChart(data.history);
+        } else {
+            console.log('No history data available for chart');
+        }
         
         // Update connection status
         connectionDot.className = 'dot online';
         connectionStatus.textContent = 'Connected';
+        console.log('Update complete!');
         
     } catch (error) {
-        console.error('Error fetching tank data:', error);
+        console.error('Error details:', error);
         
         // Show error state
         connectionDot.className = 'dot offline';
         connectionStatus.textContent = 'Error';
         
-        alert('Failed to fetch data from AWS IoT.\nError: ' + error.message);
+        alert('Failed to fetch data.\n\nError: ' + error.message + '\n\nCheck:\n1. API_URL is correct in script.js\n2. CORS is enabled\n3. Lambda is deployed\n4. Check Console (F12) for details');
     } finally {
         refreshBtn.disabled = false;
         refreshBtn.innerHTML = '<span class="refresh-icon">🔄</span> Refresh Data';
@@ -48,12 +73,16 @@ async function fetchTankData() {
 
 // Update dashboard with new data
 function updateDashboard(data) {
+    console.log('Updating dashboard...');
+    
     // Extract values
     const level = data.level || 0;
     const status = data.status || 'Unknown';
     const distance = data.distance || 0;
     const device = data.device || 'ESP32_Tank';
     const timestamp = data.timestamp || Date.now();
+    
+    console.log('Values:', { level, status, distance, device });
     
     // Update water level visual
     const waterLevel = document.getElementById('waterLevel');
@@ -99,10 +128,14 @@ function updateDashboard(data) {
         hour12: true
     });
     document.getElementById('timestamp').textContent = timeString;
+    
+    console.log('Dashboard updated!');
 }
 
 // Update or create chart with history data
 function updateChart(history) {
+    console.log('Creating chart with', history.length, 'data points');
+    
     const ctx = document.getElementById('waterLevelChart').getContext('2d');
     
     // Reverse to show oldest to newest
@@ -120,6 +153,9 @@ function updateChart(history) {
     });
     
     const levels = sortedHistory.map(item => item.level);
+    
+    console.log('Chart labels:', labels);
+    console.log('Chart levels:', levels);
     
     // Destroy existing chart if any
     if (waterLevelChart) {
@@ -183,14 +219,17 @@ function updateChart(history) {
             }
         }
     });
+    
+    console.log('Chart created successfully!');
 }
 
 // Initialize dashboard on page load
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('═══════════════════════════════════════');
     console.log('Water Tank Dashboard Initialized');
-    console.log('Manual refresh only - no auto-refresh');
+    console.log('API_URL:', API_URL);
+    console.log('═══════════════════════════════════════');
     
     // Fetch data on page load
     fetchTankData();
 });
-
